@@ -1,5 +1,5 @@
 # Batch Audio Authenticity Testing Example
-We will do a batch verification of all the audios inside the `/audios/` folder.
+In this example we do a batch verification of all the audios inside the `/audios/` folder. This is meant to facilitate the Loccus AI API Usage.
 
 # Prerequisites
 1. You need a Loccus AI account. [You can register here](https://demo.loccus.ai/signup)
