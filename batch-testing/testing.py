@@ -14,9 +14,9 @@ THRESHOLD = 0.5
 folder_path = "audios"
 
 # Define the endpoint URLs
-login_url = "https://api.stage.loccus.ai/v1/auth/credentials"
-audio_create_url = f"https://api.stage.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/audios"
-verification_create_url = f"https://api.stage.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/verifications/authenticity"
+login_url = "https://api.loccus.ai/v1/auth/credentials"
+audio_create_url = f"https://api.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/audios"
+verification_create_url = f"https://api.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/verifications/authenticity"
 
 
 #################################################################
