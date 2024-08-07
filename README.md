@@ -4,6 +4,7 @@ Repository with code examples for using Loccus AI Service.
 # Example List
 The following examples are available:
 - Batch Testing: Python script for easily making authenticity verifications for all audios in a folder.
+- Monthly Usage: Python script for easily checking the minutes of audio verified by an organization in the current month.
 
 # Service Status
 |Monitor|Status|
