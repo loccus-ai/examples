@@ -6,7 +6,7 @@ In this example we check all the verifications performed inside an organization,
 2. You need to install python. [You can download python here](https://www.python.org/downloads/)
 3. You need to install the python dependencies:
     ```sh
-    pip3 install isodate
+    pip3 install requests isodate
     ```
 
 # Execute the batch testing
