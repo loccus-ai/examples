@@ -2,6 +2,7 @@ import requests
 import os
 import base64
 from tabulate import tabulate
+import csv
 
 
 # User Defined Variables - Loaded from Environment Variables
@@ -63,6 +64,7 @@ synthetic_list = []
 not_enough_voice_list = []
 valid_list = []
 partial_spoof_dict = {}
+all_audio_results = [] # To store data for CSV export
 
 # Iterating over all audios in the folder
 for file_name in os.listdir(folder_path):
@@ -105,15 +107,31 @@ for file_name in os.listdir(folder_path):
 
     partial_spoof_dict[file_name] = response.json().get("partialSpoof", "False")
 
-    if response.json()["scores"]["synthesis"] == None:
-        not_enough_voice_list.append((file_name, audio_voice_duration))
-    else:
-        synthesis_score = float(response.json()["scores"]["synthesis"])
+    synthesis_score_val = response.json()["scores"]["synthesis"]
+    partial_spoof_result = response.json().get("partialSpoof", "False")
+    partial_spoof_dict[file_name] = partial_spoof_result
 
+    audio_data_for_csv = {
+        "Audio Filename": file_name,
+        "Partial Spoof": partial_spoof_result
+    }
+
+    if synthesis_score_val == None:
+        # audio_voice_duration is not defined in this scope, was this intended from previous version?
+        # For now, I'll use N/A for voice duration if it's needed for not_enough_voice_list
+        not_enough_voice_list.append((file_name, "N/A")) # Assuming audio_voice_duration was placeholder
+        audio_data_for_csv["Synthesis Score"] = "N/A"
+        audio_data_for_csv["Classification"] = "Not Enough Voice"
+    else:
+        synthesis_score = float(synthesis_score_val)
+        audio_data_for_csv["Synthesis Score"] = synthesis_score
         if synthesis_score < THRESHOLD:
             synthetic_list.append((file_name, synthesis_score))
+            audio_data_for_csv["Classification"] = "Synthetic"
         else:
             valid_list.append((file_name, synthesis_score))
+            audio_data_for_csv["Classification"] = "Authentic"
+    all_audio_results.append(audio_data_for_csv)
 
 
 print("\n")
@@ -172,3 +190,16 @@ print(
         tablefmt="fancy_grid",
     )
 )
+
+# Generate CSV file
+csv_file_name = "results.csv"
+csv_headers = ["Audio Filename", "Synthesis Score", "Partial Spoof", "Classification"]
+
+try:
+    with open(csv_file_name, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=csv_headers)
+        writer.writeheader()
+        writer.writerows(all_audio_results)
+    print(f"\n📄 Results have been successfully exported to {csv_file_name}")
+except IOError:
+    print(f"\nError: Could not write to {csv_file_name}")

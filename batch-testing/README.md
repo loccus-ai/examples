@@ -31,4 +31,12 @@ python3 testing.py
 ```
 
 ## 4. Review the results
-The testing script will print the overview of the audios verification. If you want to get more details, you can view the verification results in the [Hiya Console](https://developer.hiya.com/console/audiointel/signin).
+The testing script will print an overview of the audio verification to the console.
+
+Additionally, a `results.csv` file will be generated in the same directory. This file contains a detailed breakdown for each processed audio, including:
+- **Audio Filename**: The name of the audio file.
+- **Synthesis Score**: The synthesis score from the verification (or "N/A" if not applicable).
+- **Partial Spoof**: The partial spoof detection result (e.g., "True" or "False").
+- **Classification**: The overall classification of the audio (e.g., "Synthetic", "Authentic", "Not Enough Voice").
+
+If you want to get more details or manage your audios and verifications, you can also view the results in the [Hiya Console](https://developer.hiya.com/console/audiointel/signin).
