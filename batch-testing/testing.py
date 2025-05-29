@@ -4,19 +4,32 @@ import base64
 from tabulate import tabulate
 
 
-# User Defined Variables
-USERNAME = ""
-PASSWORD = ""
-SPACE = ""
-THRESHOLD = 0.5
+# User Defined Variables - Loaded from Environment Variables
+USERNAME = os.getenv("HIYA_USERNAME")
+PASSWORD = os.getenv("HIYA_PASSWORD")
+SPACE = os.getenv("HIYA_SPACE", "demo")
+THRESHOLD = float(os.getenv("HIYA_THRESHOLD", "0.5"))
+
+# Check if mandatory environment variables are set
+if not all([USERNAME, PASSWORD]):
+    missing_vars = []
+    if not USERNAME:
+        missing_vars.append("HIYA_USERNAME")
+    if not PASSWORD:
+        missing_vars.append("HIYA_PASSWORD")
+    print(f"Error: The following environment variables are not set: {', '.join(missing_vars)}")
+    print("Please set them before running the script.")
+    exit(1)
 
 # Path to the "audios" folder
 folder_path = "audios"
 
 # Define the endpoint URLs
-login_url = "https://api.loccus.ai/v1/auth/credentials"
-audio_create_url = f"https://api.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/audios"
-verification_create_url = f"https://api.loccus.ai/v1/spaces/{USERNAME}/{SPACE}/verifications/authenticity"
+region = "eu"
+domain = "api.hiya.com"
+login_url = f"https://{domain}/audiointel/{region}/v1/auth/credentials"
+audio_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{USERNAME}/{SPACE}/audios"
+verification_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{USERNAME}/{SPACE}/verifications/authenticity"
 
 
 #################################################################
@@ -46,11 +59,10 @@ print("🔓 Log in successful!")
 print(f"⚙️  Uploading and verifying the audios inside {folder_path}...")
 
 # Counters
-replay_list = []
 synthetic_list = []
-replay_and_synthetic_list = []
 not_enough_voice_list = []
 valid_list = []
+partial_spoof_dict = {}
 
 # Iterating over all audios in the folder
 for file_name in os.listdir(folder_path):
@@ -77,14 +89,13 @@ for file_name in os.listdir(folder_path):
         exit(1)
 
     audio_handle = response.json()["handle"]
-    audio_voice_duration = response.json()["voiceDuration"]
     audio_sample_rate = response.json()["sampleRate"]
 
     # We select the model based on the sample_rate
     if int(audio_sample_rate) < 16000:
-        model = "telephone"
+        model = "phone"
     else:
-        model = "default"
+        model = "digital"
 
     response = requests.post(
         verification_create_url,
@@ -92,21 +103,17 @@ for file_name in os.listdir(folder_path):
         json={"model": model, "audio": audio_handle},
     )
 
-    if response.status_code >= 400:
+    partial_spoof_dict[file_name] = response.json().get("partialSpoof", "False")
+
+    if response.json()["scores"]["synthesis"] == None:
         not_enough_voice_list.append((file_name, audio_voice_duration))
     else:
-        score = float(response.json()["score"])
-        replay_score = float(response.json()["subscores"]["replay"])
-        synthesis_score = float(response.json()["subscores"]["synthesis"])
+        synthesis_score = float(response.json()["scores"]["synthesis"])
 
-        if replay_score < THRESHOLD and synthesis_score < THRESHOLD:
-            replay_and_synthetic_list.append((file_name, replay_score, synthesis_score))
-        elif replay_score < THRESHOLD:
-            replay_list.append((file_name, replay_score, synthesis_score))
-        elif synthesis_score < THRESHOLD:
-            synthetic_list.append((file_name, replay_score, synthesis_score))
+        if synthesis_score < THRESHOLD:
+            synthetic_list.append((file_name, synthesis_score))
         else:
-            valid_list.append((file_name, replay_score, synthesis_score))
+            valid_list.append((file_name, synthesis_score))
 
 
 print("\n")
@@ -116,11 +123,7 @@ print(f"\t ✅ {len(valid_list)} Audios are authentic")
 print(
     f"\t 🤐 {len(not_enough_voice_list)} Audios don't have enough voice for the verification"
 )
-print(f"\t 🔊 {len(replay_list)} Audios are detected as replayed")
 print(f"\t 🤖 {len(synthetic_list)} Audios are detected as synthetic")
-print(
-    f"\t 🤖🔊 {len(replay_and_synthetic_list)} Audios are detected as replayed and synthetic"
-)
 
 print("\n")
 print(f"#############################################################")
@@ -128,7 +131,7 @@ print(f"📋✅ List of Authentic Audios")
 print(f"#############################################################")
 print(
     tabulate(
-        [("Audio", "Replay Score", "Synthetic Score")] + valid_list,
+        [("Audio", "Synthetic Score")] + valid_list,
         headers="firstrow",
         tablefmt="fancy_grid",
     )
@@ -146,39 +149,25 @@ print(
     )
 )
 
-
-print("\n")
-print(f"#############################################################")
-print(f"📋🔊 List of Audios that are detected as replayed")
-print(f"#############################################################")
-print(
-    tabulate(
-        [("Audio", "Replay Score", "Synthetic Score")] + replay_list,
-        headers="firstrow",
-        tablefmt="fancy_grid",
-    )
-)
-
 print("\n")
 print(f"#############################################################")
 print(f"📋🤖 List of Audios are detected as synthetic")
 print(f"#############################################################")
 print(
     tabulate(
-        [("Audio", "Replay Score", "Synthetic Score")] + synthetic_list,
+        [("Audio", "Synthesis Score")] + synthetic_list,
         headers="firstrow",
         tablefmt="fancy_grid",
     )
 )
 
-
 print("\n")
 print(f"#############################################################")
-print(f"📋🤖🔊 List of Audios are detected as replayed and synthetic")
+print(f"Partial Spoof Results")
 print(f"#############################################################")
 print(
     tabulate(
-        [("Audio", "Replay Score", "Synthetic Score")] + replay_and_synthetic_list,
+        [("Audio", "Partial Spoof Result")] + [item for item in partial_spoof_dict.items()],
         headers="firstrow",
         tablefmt="fancy_grid",
     )

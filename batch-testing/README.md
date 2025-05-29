@@ -1,9 +1,8 @@
 # Batch Audio Authenticity Testing Example
-In this example we do a batch verification of all the audios inside the `/audios/` folder. This is meant to facilitate the Loccus AI API Usage.
+In this example we do a batch verification of all the audios inside the `/audios/` folder. This is meant to facilitate the Hiya API Usage.
 
 # Prerequisites
-1. You need a Loccus AI account. [You can register here](https://demo.loccus.ai/signup)
-2. You need an space inside Loccus AI Platform. For creating the space, please contact support@loccus.ai
+1. You need a Hiya account. [You can register here](https://developer.hiya.com/console/audiointel/signup)
 2. You need to install python. [You can download python here](https://www.python.org/downloads/)
 3. You need to install the python dependencies:
     ```sh
@@ -14,18 +13,22 @@ In this example we do a batch verification of all the audios inside the `/audios
 ## 1. Load the audios
 You must place the audios that you want to verify inside the `/audios/` folder. [You can check here the audio requirements](https://docs.loccus.ai/api-reference/audios/requirements).
 
-## 2. Set the requiered variables inside the script file.
-You must specify your Loccus AI username, password and space inside `testing.py`: 
-```text
-USERNAME = "<YOUR USERNAME>"
-PASSWORD = "<YOUR PASSWORD>"
-SPACE = "<YOUR SPACE>"
+## 2. Set the required environment variables.
+Before running the script, you need to set the following environment variables. You can do this in your terminal session or by adding them to your shell's configuration file (e.g., `.bashrc`, `.zshrc`).
+
+```sh
+export HIYA_USERNAME="<YOUR_USERNAME>"
+export HIYA_PASSWORD="<YOUR_PASSWORD>"
+# Optional: Set a custom threshold (defaults to 0.5 if not set)
+# export HIYA_THRESHOLD="0.6"
 ```
+Replace `<YOUR_USERNAME>`, `<YOUR_PASSWORD>` with your actual Hiya credentials.
 
 ## 3. Execute the test script
+Once the environment variables are set, you can run the script:
 ```sh
 python3 testing.py
 ```
 
 ## 4. Review the results
-The testing script will print the overview of the audios verification. If you want to get more details, you can view the verification results in the [Loccus AI Console](https://console.loccus.ai/).
+The testing script will print the overview of the audios verification. If you want to get more details, you can view the verification results in the [Hiya Console](https://developer.hiya.com/console/audiointel/signin).
