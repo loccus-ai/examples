@@ -6,16 +6,16 @@ import csv
 
 
 # User Defined Variables - Loaded from Environment Variables
-USERNAME = os.getenv("HIYA_USERNAME")
+HANDLE = os.getenv("HIYA_HANDLE")
 PASSWORD = os.getenv("HIYA_PASSWORD")
-SPACE = os.getenv("HIYA_SPACE", "demo")
+SPACE = os.getenv("HIYA_SPACE", "main")
 THRESHOLD = float(os.getenv("HIYA_THRESHOLD", "0.5"))
 
 # Check if mandatory environment variables are set
-if not all([USERNAME, PASSWORD]):
+if not all([HANDLE, PASSWORD]):
     missing_vars = []
-    if not USERNAME:
-        missing_vars.append("HIYA_USERNAME")
+    if not HANDLE:
+        missing_vars.append("HIYA_HANDLE")
     if not PASSWORD:
         missing_vars.append("HIYA_PASSWORD")
     print(f"Error: The following environment variables are not set: {', '.join(missing_vars)}")
@@ -29,8 +29,8 @@ folder_path = "audios"
 region = "eu"
 domain = "api.hiya.com"
 login_url = f"https://{domain}/audiointel/{region}/v1/auth/credentials"
-audio_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{USERNAME}/{SPACE}/audios"
-verification_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{USERNAME}/{SPACE}/verifications/authenticity"
+audio_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{HANDLE}/{SPACE}/audios"
+verification_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{HANDLE}/{SPACE}/verifications/authenticity"
 
 
 #################################################################
@@ -39,7 +39,7 @@ verification_create_url = f"https://{domain}/audiointel/{region}/v1/spaces/{USER
 print("🔒 Logging in...")
 
 # Make the POST request with the payload
-response = requests.post(login_url, json={"handle": USERNAME, "password": PASSWORD})
+response = requests.post(login_url, json={"handle": HANDLE, "password": PASSWORD})
 
 # Check if the request was successful (status code 200)
 if response.status_code == 200:
