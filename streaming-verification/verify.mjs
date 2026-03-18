@@ -8,7 +8,7 @@ import WebSocket from "ws";
 program
   .requiredOption("--target <target>", "Target: local or upstream")
   .requiredOption("--audio <path>", "Path to audio file")
-  .option("--model <model>", "Model name", "default")
+  .option("--model <model>", "Model name", "phone")
   .option("--port <port>", "Local WS port (local target)", "3001")
   .option("--host <host>", "Local host (local target)", "localhost")
   .option("--token <token>", "Bearer token (upstream target)")

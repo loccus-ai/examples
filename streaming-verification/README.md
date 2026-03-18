@@ -60,7 +60,7 @@ node verify.mjs --target upstream --audio path/to/audio.wav \
 
 | Flag | Description | Default |
 |---|---|---|
-| `--model <model>` | Model name to use for verification | `default` |
+| `--model <model>` | Model name to use for verification | `phone` |
 | `--synthesis-sources` | Enable synthesis source scores | `false` |
 | `--audio-format <format>` | Audio format hint (e.g., `wav`, `flac`) | auto-detected |
 
